@@ -35,7 +35,6 @@ router.get('/:id',async  (req, res) => {
 router.post('/', async (req, res) => {
   try{
     const categoryData = await Category.create({
-      category_id: req.body.category_id,
       category_name: req.body.category_name
     });
     res.status(200).json(categoryData)
@@ -48,21 +47,13 @@ router.post('/', async (req, res) => {
   // update a category by its `id` value
   router.put('/:id', async (req, res) => {
     try {
-      const { id } = req.params;
-      const { categoryName } = req.body; // Destructure category name and other updates
-  
-      const categoryData = await Category.findByPk(id);
-  
+      const categoryData = await Category.update(req.body, {
+        where: { id: req.params.id },
+      });
       if (!categoryData) {
-        return res.status(404).json({ message: 'No Category found with this id!' });
+        res.status(404).json({ message: "There's no ID for that category."});
+        return;
       }
-  
-      // Update category name and potentially other fields
-      categoryData.category_name = categoryName;
-      // Update other fields based on "otherUpdates" object properties
-  
-      await categoryData.save(); // Save the updated category
-  
       res.status(200).json(categoryData);
     } catch (err) {
       res.status(500).json(err);
@@ -74,7 +65,7 @@ router.delete('/:id',  async (req, res) => {
   try {
     const categoryData = await Category.destroy({
       where: {
-        id: req.params.category_id
+        id: req.params.id
       }
     });
 
